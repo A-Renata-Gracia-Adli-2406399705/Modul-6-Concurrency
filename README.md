@@ -31,3 +31,11 @@ Refactoring ini membuat kode menjadi lebih ringkas, mudah dibaca, dan lebih muda
 
 ![Commit 3 screen capture](/assets/images/commit3.png)
 ![Commit 3 bad screen capture](/assets/images/commit3bad.png)
+
+
+# Commit 4 Reflection notes
+
+Milestone keempat menyuruh untuk mensimulasikan condition di mana server membutuhkan durasi untuk memproses suatu request. Hal ini dilakukan dengan menambahkan endpoint `/sleep`, yang akan membuat server “tidur” selama beberapa detik menggunakan `thread::sleep(Duration::from_secs(10))` sebelum memberikan response.
+Saya menggunakan `match` untuk menangani beberapa kemungkinan request, yaitu request ke root (`/`), request ke `/sleep`, dan request lainnya. `if-else` diubah ke `match` karena jumlah condition menjadi lebih dari dua sehingga `match` lebih rapi dan mudah dibaca.
+Ketika saya membuka dua browser di mana satu mengakses `/sleep` dan satu lagi mengakses `/`, terlihat bahwa request kedua ikut tertunda hingga request `/sleep` selesai. Hal ini terjadi karena server masih berjalan secara single-threaded sehingga hanya dapat memproses satu request dalam satu waktu.
+Jadi, jika terdapat request yang lambat, maka request lain harus menunggu, yang menyebabkan performa server menjadi buruk. Hal ini merupakan kelemahan dari single-threaded dalam menangani banyak client secara bersamaan.
