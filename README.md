@@ -47,3 +47,10 @@ Server dikembangkan menjadi multithreaded menggunakan ThreadPool agar dapat mena
 ThreadPool bekerja dengan menyediakan sejumlah thread yang siap digunakan. Setiap request yang masuk dimasukkan ke dalam queue, lalu akan diambil dan diproses oleh thread yang tersedia. Cara ini lebih efisien dibanding membuat thread baru untuk setiap request karena jika setiap request membuat thread baru, maka jumlah thread bisa menjadi sangat banyak dan membebani sistem (misalnya dalam DoS). Dengan ThreadPool, jumlah thread dibatasi sehingga penggunaan resource lebih terkontrol.
 Implementasinya menggunakan channel (`mpsc`) untuk mengirim job ke Worker, serta `Arc<Mutex<>>` agar beberapa thread dapat berbagi akses secara aman. Setiap Worker akan terus menunggu job dan mengeksekusinya ketika tersedia.
 Maka, server mampu memproses request secara paralel dan memiliki performa yang lebih baik dibanding versi single-threaded.
+
+
+# Commit Bonus Reflection notes
+
+Saya telah membuat fungsi `build` sebagai alternatif dari fungsi `new` dalam pembuatan ThreadPool. Perbedaan utama antara keduanya adalah bahwa `build` mengembalikan `Result<ThreadPool, String>` sehingga memungkinkan penanganan error secara lebih fleksibel dibandingkan dengan `new` yang menggunakan `assert!` untuk memvalidasi ukuran threadpool dan akan langsung panic (crash) jika terjadi kesalahan, yaitu jika ukuran bernilai 0.
+Dengan menggunakan `build`, program dapat mengembalikan error jika ukuran threadpool tidak valid (misalnya 0), tanpa langsung menghentikan program. Hal ini lebih sesuai untuk aplikasi yang membutuhkan robustness dan error handling yang lebih baik.
+Penggunaan `new` cocok untuk kasus sederhana, sedangkan `build` lebih cocok untuk kasus yang membutuhkan validasi dan error handling yang lebih kompleks.
