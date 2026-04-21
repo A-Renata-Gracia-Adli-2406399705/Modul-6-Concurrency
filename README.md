@@ -18,3 +18,16 @@ Selain itu, saya mulai memahami struktur HTTP response. Server harus mengirimkan
 Setelah perubahan ini, ketika mengakses server melalui browser, halaman HTML berhasil ditampilkan. Hal ini menunjukkan bahwa server sudah dapat memberikan response yang valid kepada client.
 
 ![Commit 2 screen capture](/assets/images/commit2.png)
+
+
+# Commit 3 Reflection notes
+
+Milestone ketiga menyuruh untuk menambahkan mekanisme validasi terhadap request yang diterima oleh server. Sebelumnya, server selalu mengembalikan file HTML yang sama tanpa memperhatikan request dari client. Pada tahap ini, server mulai membaca dan menganalisis request yang dikirim oleh browser.
+Saya menggunakan `buf_reader.lines().next()` untuk mengambil hanya baris pertama dari HTTP request, yang disebut sebagai request line (contoh: `GET / HTTP/1.1`). Baris ini berisi informasi penting seperti method (GET), path (/), dan versi HTTP.
+Selanjutnya, saya membandingkan nilai request line tersebut dengan string `"GET / HTTP/1.1"` menggunakan kondisi `if`. Jika request sesuai (yaitu user mengakses root `/`), maka server akan mengembalikan file `hello.html` dengan status `200 OK`. Namun, jika request tidak sesuai, maka server akan mengembalikan file `404.html` dengan status `404 NOT FOUND`.
+Maka, server sudah dapat membedakan antara request yang valid dan tidak valid, serta memberikan response yang sesuai.
+Selain itu, dilakukan refactoring untuk mengurangi duplikasi kode antara blok `if` dan `else`. Sebelumnya, kedua blok memiliki kode yang hampir sama untuk membaca file dan menulis response ke stream. Setelah refactoring, perbedaan hanya terletak pada `status_line` dan `filename`, yang disimpan dalam bentuk tuple. Nilai ini kemudian digunakan di luar blok kondisi untuk membangun response.
+Refactoring ini membuat kode menjadi lebih ringkas, mudah dibaca, dan lebih mudah untuk dikembangkan nanti karena perubahan hanya perlu dilakukan di satu tempat.
+
+![Commit 3 screen capture](/assets/images/commit3.png)
+![Commit 3 bad screen capture](/assets/images/commit3bad.png)
