@@ -39,3 +39,11 @@ Milestone keempat menyuruh untuk mensimulasikan condition di mana server membutu
 Saya menggunakan `match` untuk menangani beberapa kemungkinan request, yaitu request ke root (`/`), request ke `/sleep`, dan request lainnya. `if-else` diubah ke `match` karena jumlah condition menjadi lebih dari dua sehingga `match` lebih rapi dan mudah dibaca.
 Ketika saya membuka dua browser di mana satu mengakses `/sleep` dan satu lagi mengakses `/`, terlihat bahwa request kedua ikut tertunda hingga request `/sleep` selesai. Hal ini terjadi karena server masih berjalan secara single-threaded sehingga hanya dapat memproses satu request dalam satu waktu.
 Jadi, jika terdapat request yang lambat, maka request lain harus menunggu, yang menyebabkan performa server menjadi buruk. Hal ini merupakan kelemahan dari single-threaded dalam menangani banyak client secara bersamaan.
+
+
+# Commit 5 Reflection notes
+
+Server dikembangkan menjadi multithreaded menggunakan ThreadPool agar dapat menangani beberapa request secara bersamaan tanpa terhambat oleh request yang lambat.
+ThreadPool bekerja dengan menyediakan sejumlah thread yang siap digunakan. Setiap request yang masuk dimasukkan ke dalam queue, lalu akan diambil dan diproses oleh thread yang tersedia. Cara ini lebih efisien dibanding membuat thread baru untuk setiap request karena jika setiap request membuat thread baru, maka jumlah thread bisa menjadi sangat banyak dan membebani sistem (misalnya dalam DoS). Dengan ThreadPool, jumlah thread dibatasi sehingga penggunaan resource lebih terkontrol.
+Implementasinya menggunakan channel (`mpsc`) untuk mengirim job ke Worker, serta `Arc<Mutex<>>` agar beberapa thread dapat berbagi akses secara aman. Setiap Worker akan terus menunggu job dan mengeksekusinya ketika tersedia.
+Maka, server mampu memproses request secara paralel dan memiliki performa yang lebih baik dibanding versi single-threaded.
